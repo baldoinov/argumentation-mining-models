@@ -1,0 +1,20 @@
+-e .
+black
+datasets<=2.19.2
+ipykernel
+ipython
+jupyterlab
+lightning<=2.2.4
+matplotlib
+nltk
+notebook
+numpy<2.0.0
+pandas
+openpyxl
+scikit-learn
+seaborn
+torch<=2.2.2
+tqdm
+transformers<=4.39.3
+Unidecode
+jsonargparse[signatures]>=4.27.7
