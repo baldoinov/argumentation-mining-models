@@ -1,0 +1,50 @@
+seed_everything: 42
+model:
+  n_classes: 3
+  learning_rate: 0.001
+  model_checkpoint: josu/albert-pt-br
+  id2label: {0: "NEUTRO", 1: "POSITIVO", 2: "NEGATIVO"}
+  label2id: {"NEUTRO": 0, "POSITIVO": 1, "NEGATIVO": 2}
+  # Computed on the training set with sklearn.utils.class_weight.compute_class_weight
+  class_weights:
+    - 1.
+    - 1.
+    - 1.
+  train_last_n_layers: full
+  task: "sentiment-analysis"
+data:
+  raw_data_path: data/raw/sentimento/sentimento.xlsx
+  processed_data_dir: data/processed/sentimento/
+  batch_size: 32
+  num_workers: 4
+  model_checkpoint: josu/albert-pt-br
+  max_length: 128
+  columns_to_rename: {"Sentimento": "labels"}
+  columns_to_drop:
+    - conversation_id
+  class_names:
+    - "NEUTRO" 
+    - "POSITIVO"
+    - "NEGATIVO"
+  cleaning_steps:
+    - from_unicode_to_ascii
+    - remove_user_from_tweet
+    - remove_urls
+    - remove_non_word_chars
+    - remove_repeated_chars
+    - remove_trailing_whitespace
+trainer:
+  fast_dev_run: false
+  max_epochs: 5
+  min_epochs: 1
+  logger:
+    - class_path: lightning.pytorch.loggers.CSVLogger
+      init_args:
+        save_dir: models/classifier-head-finetuning/sentimento/albert/
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: models/classifier-head-finetuning/sentimento/albert/checkpoint/
+        filename: "albert-{epoch}-{step}-{val_f1:.2f}"
+        monitor: val_f1
+        mode: max
